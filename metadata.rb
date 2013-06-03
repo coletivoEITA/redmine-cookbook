@@ -10,6 +10,6 @@ version          "0.1.0"
   supports os
 end
 
-%W{ git mysql database unicorn }.each do |cb|
+%W{ git mysql database iptables unicorn }.each do |cb|
   depends cb
 end

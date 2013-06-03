@@ -28,7 +28,7 @@ end
 
 # Setup database # TODO cover postgresql
 # TODO set default character utf8 /etc/mycnf
-include_recipe "mysql::server" # TODO cover 'recipe[mysql::server_ec2]'
+include_recipe "mysql::server" # TODO support 'recipe[mysql::server_ec2]'
 include_recipe "mysql::client"
 include_recipe "mysql::ruby"
 
@@ -66,8 +66,20 @@ end
 # Install unicorn
 include_recipe "unicorn"
 
-# TODO enable iptables 80
+# Setup firewall
+service "iptables" do
+  supports :status => true, :restart => true, :reload => true
+  action [:enable, :start]
+end
 
+template "/etc/sysconfig/iptables" do
+  source "iptables.erb"
+  owner "root"
+  group "root"
+  mode "0600"
+  variables({:port => node["redmine"]["port"]})
+  notifies :restart, "service[iptables]"
+end
 
 if node[:platform_family] == "rhel"
   %w{ ImageMagick ImageMagick-devel ipa-pgothic-fonts }.each do |pkg|
