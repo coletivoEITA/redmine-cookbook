@@ -1,4 +1,4 @@
-# redmine cookbook
+# Redmine cookbook
 
 # Requirements
 Chef version 0.10.10+
@@ -18,7 +18,11 @@ Tested on:
 * database
 * unicorn
 
+## Gemfile.lock
+Your redmine app must have `Gemfile.lock` to success `$ bundle install`.
+
 # Usage
+TODO
 
 # Attributes
 See the `attributes/default.rb` for default values.

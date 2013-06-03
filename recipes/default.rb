@@ -89,7 +89,7 @@ directory "#{node['redmine']['deploy_to']}/shared" do
   mode "0755"
 end
 
-%w{ config log system pids cached-copy }.each do |dir|
+%w{ config log system pids cached-copy bundle }.each do |dir|
   directory "#{node['redmine']['deploy_to']}/shared/#{dir}" do
     owner node["redmine"]["user"]
     group node["redmine"]["user"]
@@ -113,36 +113,28 @@ deploy_revision node["redmine"]["deploy_to"] do
 
   # Migrate
   before_migrate do
-    template "#{node['redmine']['deploy_to']}/shared/config/database.yml" do
-      source "database.yml.erb"
-      owner node["redmine"]["user"]
-      group node["redmine"]["user"]
-      mode "0644"
-      variables({
-        :database => "redmine",
-        :host     => "localhost",
-        :username => "redmine_user",
-        :password => "super",
-        :encoding => "utf8"
-      })
-    end
-    # 下記 resource は bundle install する前は shared から release へ
-    # に symlink が貼れれておらず adapter の指定をするためここにもファイルを置く
-    template "#{release_path}/config/database.yml" do
-      source "database.yml.erb"
-      owner node["redmine"]["user"]
-      group node["redmine"]["user"]
-      mode "0644"
-      variables({
-        :database => "redmine",
-        :host     => "localhost",
-        :username => "redmine_user",
-        :password => "super",
-        :encoding => "utf8"
-      })
+    [
+      "#{node['redmine']['deploy_to']}/shared/config/database.yml",
+      "#{release_path}/config/database.yml"
+    ].each do |dir|
+      template dir do
+        source "database.yml.erb"
+        owner node["redmine"]["user"]
+        group node["redmine"]["user"]
+        mode "0644"
+        variables({
+          :database => "redmine",
+          :host     => "localhost",
+          :username => "redmine_user",
+          :password => "super",
+          :encoding => "utf8"
+        })
+      end
     end
     # TODO config/configuration.yml
-    execute "bundle install --without development test > /tmp/bundle.log" do
+    #execute "bundle install --without development test > /tmp/bundle.log" do
+    execute "bundle install --path #{node["redmine"]["deploy_to"]}/shared/bundle > /tmp/bundle.log" do
+      user "root"
       cwd release_path
       action :run
     end
@@ -161,6 +153,9 @@ deploy_revision node["redmine"]["deploy_to"] do
     unicorn_config "#{release_path}/config/unicorn.rb" do
       listen({ "80" => { :tcp_nodelay => true, :backlog => 100 }})
       worker_processes "5"
+      pid "#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid"
+      stderr_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stderr.log"
+      stdout_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stdout.log"
     end
   end
   purge_before_symlink %w{ log tmp/pids public/system }
@@ -170,5 +165,13 @@ deploy_revision node["redmine"]["deploy_to"] do
            "log"    => "log"
 
   # Restart
-  # TODO restart unicorn
+  # TODO restart unicorn process by runit
 end
+
+# execute "unicorn -c config/unicorn.rb -D -E production" do
+#   user "root"
+#   cwd "#{node["redmine"]["deploy_to"]}/current"
+#   not_if { ::File.exists?("#{node["redmine"]["deploy_to"]}/shared/pids/unicorn.pid") }
+#   action :run
+# end
+
