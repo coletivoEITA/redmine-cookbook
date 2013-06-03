@@ -1,4 +1,18 @@
 # Redmine cookbook
+This cookbook is designed to deploy the Redmine application.
+
+Currently supported:
+
+* Deploy the redmine app from the source
+* Install and Manage MySQL by the opscode official recipe
+* Install and Manage nginx with Unicorn by the opscode official recipe
+
+Roadmap:
+
+* Support log rotate for Rails, Unicorn logs
+* Use node attributes instead of hard coding
+* Support USR2 restart process
+* Support installing ruby
 
 # Requirements
 Chef version 0.10.10+

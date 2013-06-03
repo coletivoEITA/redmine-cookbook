@@ -94,12 +94,6 @@ template "/etc/sysconfig/iptables" do
   notifies :restart, "service[iptables]"
 end
 
-if node[:platform_family] == "rhel"
-  %w{ ImageMagick ImageMagick-devel ipa-pgothic-fonts }.each do |pkg|
-    package pkg
-  end
-end
-
 # Making the directories for deploy
 directory node["redmine"]["deploy_to"] do
   owner node["redmine"]["user"]
@@ -120,6 +114,20 @@ end
     group node["redmine"]["user"]
     mode "0755"
     recursive true
+  end
+end
+
+# Insall and setup for rmagick
+if node[:platform_family] == "rhel"
+  %w{ ImageMagick ImageMagick-devel ipa-pgothic-fonts }.each do |pkg|
+    package pkg
+  end
+  template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
+    source "configuration.yml.erb"
+    owner node["redmine"]["user"]
+    group node["redmine"]["user"]
+    mode "0644"
+    variables({:domain => node["redmine"]["domain"]})
   end
 end
 

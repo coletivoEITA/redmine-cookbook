@@ -21,8 +21,9 @@
 default["redmine"]["user"]      = "root"
 default["redmine"]["deploy_to"] = "/opt/redmine"
 default["redmine"]["repo"]      = "git://github.com/spesnova/redmine.git"
-default["redmine"]["revision"]  = "795c25eb62b5f9acd7cf8c13133302219606ed2e"
+default["redmine"]["revision"]  = "f64c3151534020ed917f405d497128d22ba6fada"
 default["redmine"]["port"]      = "80"
+default["redmine"]["domain"]    = "redmine.example.com"
 
 # database setting
 default["redmine"]["db"]["name"] = "redmine"
