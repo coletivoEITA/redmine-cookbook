@@ -33,15 +33,8 @@ include_recipe "mysql::ruby"
 # TODO support 'recipe[mysql::server_ec2]'
 include_recipe "mysql::server"
 
-# Set "default-character-set=utf8" in [mysql] section
-execute 'sed -i "s/\[mysql\]/\[mysql\]\ndefault-character-set=utf8/" /etc/my.cnf' do
-  user "root"
-  not_if "grep 'default-character-set=utf8' /etc/my.cnf"
-  action :run
-end
-
 service "mysqld" do
-  supports :status => true, :restart => true, :reload => true
+  supports :status => true, :restart => true
   action [ :enable, :start ]
 end
 
