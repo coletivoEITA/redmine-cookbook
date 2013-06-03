@@ -55,6 +55,26 @@ Setup the redmine application.
 # Data Bags
 This cookbook use the redmine data bag for some password.
 
+Use knife to create a data bag for redmine.
+```
+$ knife data bag create redmine
+$ mkdir data_bags/redmine
+```
+Create a secret redmine data in the `data_bag/redmine/secret.json` directory.
+```
+{
+  "id": "secret",
+  "db_user_password": "<PASSWORD>"
+}
+```
+
+* `db_user_password` - The password described in config/database.yml
+
+Upload the json data to Chef Server.
+```
+$ knife data bag from file redmine data_bags/redmine/secret.json
+```
+
 # License and Author
 
 Author:: Seigo Uchida (<spesnova@gmail.com>)

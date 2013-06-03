@@ -54,7 +54,7 @@ end
 mysql_database_user "redmine_user" do
   connection connection_info
   # TODO use data bags
-  password "super"
+  password data_bag_item("redmine", "secret")["db_user_password"]
   action :create
 end
 
@@ -63,7 +63,7 @@ mysql_database_user "redmine_user" do
   database_name "redmine"
   privileges [:all]
   # TODO use data bags
-  password "super"
+  password data_bag_item("redmine", "secret")["db_user_password"]
   action :grant
 end
 
@@ -152,7 +152,7 @@ deploy_revision node["redmine"]["deploy_to"] do
           :database => "redmine",
           :host     => "localhost",
           :username => "redmine_user",
-          :password => "super",
+          :password => data_bag_item("redmine", "secret")["db_user_password"],
           :encoding => "utf8"
         })
       end
