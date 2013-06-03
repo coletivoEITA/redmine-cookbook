@@ -26,3 +26,5 @@ default["redmine"]["port"]      = "80"
 
 # database setting
 default["redmine"]["db"]["name"] = "redmine"
+default['mysql']['tunable']['character-set-server'] = "utf8"
+

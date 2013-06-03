@@ -26,11 +26,24 @@ user node["redmine"]["user"] do
   system true
 end
 
-# Setup database # TODO cover postgresql
-# TODO set default character utf8 /etc/mycnf
-include_recipe "mysql::server" # TODO support 'recipe[mysql::server_ec2]'
+# Setup database
+# TODO cover postgresql
 include_recipe "mysql::client"
 include_recipe "mysql::ruby"
+# TODO support 'recipe[mysql::server_ec2]'
+include_recipe "mysql::server"
+
+# Set "default-character-set=utf8" in [mysql] section
+execute 'sed -i "s/\[mysql\]/\[mysql\]\ndefault-character-set=utf8/" /etc/my.cnf' do
+  user "root"
+  not_if "grep 'default-character-set=utf8' /etc/my.cnf"
+  action :run
+end
+
+service "mysqld" do
+  supports :status => true, :restart => true, :reload => true
+  action [ :enable, :start ]
+end
 
 connection_info = {
   :host => "localhost",
@@ -87,7 +100,7 @@ if node[:platform_family] == "rhel"
   end
 end
 
-# Prepare about deploy directories
+# Making the directories for deploy
 directory node["redmine"]["deploy_to"] do
   owner node["redmine"]["user"]
   group node["redmine"]["user"]
@@ -144,7 +157,6 @@ deploy_revision node["redmine"]["deploy_to"] do
       end
     end
     # TODO config/configuration.yml
-    #execute "bundle install --without development test > /tmp/bundle.log" do
     execute "bundle install --path #{node["redmine"]["deploy_to"]}/shared/bundle > /tmp/bundle.log" do
       user "root"
       cwd release_path
@@ -177,7 +189,7 @@ deploy_revision node["redmine"]["deploy_to"] do
            "log"    => "log"
 
   # Restart
-  # TODO support restart process to USR2
+  # TODO support USR2 restart process
   restart_command "kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`"
 
 end
