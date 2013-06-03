@@ -177,13 +177,15 @@ deploy_revision node["redmine"]["deploy_to"] do
            "log"    => "log"
 
   # Restart
-  # TODO restart unicorn process by runit
+  # TODO support restart process to USR2
+  restart_command "kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`"
+
 end
 
-# execute "unicorn -c config/unicorn.rb -D -E production" do
-#   user "root"
-#   cwd "#{node["redmine"]["deploy_to"]}/current"
-#   not_if { ::File.exists?("#{node["redmine"]["deploy_to"]}/shared/pids/unicorn.pid") }
-#   action :run
-# end
+execute "bundle exec unicorn -c config/unicorn.rb -D -E production" do
+  user "root"
+  cwd "#{node["redmine"]["deploy_to"]}/current"
+  not_if { ::File.exists?("#{node["redmine"]["deploy_to"]}/shared/pids/unicorn.pid") }
+  action :run
+end
 
