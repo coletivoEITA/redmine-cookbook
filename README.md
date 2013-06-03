@@ -12,7 +12,8 @@ Roadmap:
 * Support log rotate for Rails, Unicorn logs
 * Use node attributes instead of hard coding
 * Support USR2 restart process
-* Support installing ruby
+* Support ruby install
+* Support other platform
 
 # Requirements
 Chef version 0.10.10+

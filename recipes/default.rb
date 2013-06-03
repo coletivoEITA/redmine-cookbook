@@ -198,7 +198,9 @@ deploy_revision node["redmine"]["deploy_to"] do
 
   # Restart
   # TODO support USR2 restart process
-  restart_command "kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`"
+  if ::File.exists?("#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`")
+    restart_command "kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`"
+  end
 
 end
 
