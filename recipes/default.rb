@@ -115,13 +115,6 @@ if node[:platform_family] == "rhel"
   %w{ ImageMagick ImageMagick-devel ipa-pgothic-fonts }.each do |pkg|
     package pkg
   end
-  template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
-    source "configuration.yml.erb"
-    owner node["redmine"]["user"]
-    group node["redmine"]["user"]
-    mode "0644"
-    variables({:domain => node["redmine"]["domain"]})
-  end
 end
 
 # Deploy the redmine app
@@ -157,7 +150,12 @@ deploy_revision node["redmine"]["deploy_to"] do
         })
       end
     end
-    # TODO config/configuration.yml
+    template "#{node['redmine']['deploy_to']}/shared/config/configuration.yml" do
+      source "configuration.yml.erb"
+      owner node["redmine"]["user"]
+      group node["redmine"]["user"]
+      mode "0644"
+    end
     execute "bundle install --path #{node["redmine"]["deploy_to"]}/shared/bundle > /tmp/bundle.log" do
       user "root"
       cwd release_path
@@ -169,7 +167,8 @@ deploy_revision node["redmine"]["deploy_to"] do
       action :run
     end
   end
-  symlink_before_migrate "config/database.yml" => "config/database.yml"
+  symlink_before_migrate "config/database.yml" => "config/database.yml",
+                         "config/configuration.yml" => "config/configuration.yml"
   migrate true
   migration_command "bundle exec rake db:migrate --trace >/tmp/migration.log 2>&1"
 

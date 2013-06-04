@@ -2,8 +2,8 @@ production:
   email_delivery:
     delivery_method: :smtp
     smtp_settings:
-      address: "localhost"
+      address: localhost
       port: 25
-      domain: "<%= @domain %>"
+      domain: <%= node["fqdn"] %>
 
   rmagick_font_path: /usr/share/fonts/ipa-pgothic/ipagp.ttf
