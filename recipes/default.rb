@@ -53,7 +53,6 @@ end
 
 mysql_database_user "redmine_user" do
   connection connection_info
-  # TODO use data bags
   password data_bag_item("redmine", "secret")["db_user_password"]
   action :create
 end
@@ -62,7 +61,6 @@ mysql_database_user "redmine_user" do
   connection connection_info
   database_name "redmine"
   privileges [:all]
-  # TODO use data bags
   password data_bag_item("redmine", "secret")["db_user_password"]
   action :grant
 end
@@ -73,11 +71,6 @@ end
 include_recipe "unicorn"
 
 # Setup firewall
-service "iptables" do
-  supports :status => true, :restart => true, :reload => true
-  action [:enable, :start]
-end
-
 template "/etc/sysconfig/iptables" do
   source "iptables.erb"
   owner "root"
@@ -85,6 +78,11 @@ template "/etc/sysconfig/iptables" do
   mode "0600"
   variables({:port => node["redmine"]["port"]})
   notifies :restart, "service[iptables]"
+end
+
+service "iptables" do
+  supports :status => true, :restart => true, :reload => true
+  action [:enable, :start]
 end
 
 # Making the directories for deploy
