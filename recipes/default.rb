@@ -67,8 +67,6 @@ end
 
 # Setup web server
 # TODO install nginx
-# Install unicorn
-include_recipe "unicorn"
 
 # Setup firewall
 template "/etc/sysconfig/iptables" do
@@ -106,6 +104,18 @@ end
     mode "0755"
     recursive true
   end
+end
+
+# Install unicorn
+include_recipe "unicorn"
+
+# TODO add notifies attribute that notify restart unicorn
+unicorn_config "#{node['redmine']['deploy_to']}/shared/config/unicorn.rb" do
+  listen({ "80" => { :tcp_nodelay => true, :backlog => 100 }})
+  worker_processes "5"
+  pid "#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid"
+  stderr_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stderr.log"
+  stdout_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stdout.log"
 end
 
 # Insall and setup for rmagick
@@ -165,26 +175,18 @@ deploy_revision node["redmine"]["deploy_to"] do
       action :run
     end
   end
-  symlink_before_migrate "config/database.yml" => "config/database.yml",
-                         "config/configuration.yml" => "config/configuration.yml"
+  symlink_before_migrate "config/database.yml" => "config/database.yml"
   migrate true
-  migration_command "bundle exec rake db:migrate --trace >/tmp/migration.log 2>&1"
+  migration_command "bundle exec rake db:migrate --trace >/tmp/migration.log 2>&1 && bundle exec rake redmine:plugins --trace > /tmp/plugins_migration.log"
 
   # Symlink
-  before_symlink do
-    unicorn_config "#{release_path}/config/unicorn.rb" do
-      listen({ "80" => { :tcp_nodelay => true, :backlog => 100 }})
-      worker_processes "5"
-      pid "#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid"
-      stderr_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stderr.log"
-      stdout_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stdout.log"
-    end
-  end
   purge_before_symlink %w{ log tmp/pids public/system }
   create_dirs_before_symlink %w{ tmp public config }
   symlinks "system" => "public/system",
            "pids"   => "tmp/pids",
-           "log"    => "log"
+           "log"    => "log",
+           "config/configuration.yml" => "config/configuration.yml",
+           "config/unicorn.rb" => "config/unicorn.rb"
 
   # Restart
   # TODO support USR2 restart process
