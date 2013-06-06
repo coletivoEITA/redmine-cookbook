@@ -21,9 +21,13 @@
 default["redmine"]["user"]      = "root"
 default["redmine"]["deploy_to"] = "/opt/redmine"
 default["redmine"]["repo"]      = "git://github.com/spesnova/redmine.git"
-default["redmine"]["revision"]  = "081075731df2e1a5a0780bd9488052471dcf00a8"
+default["redmine"]["revision"]  = "bfa275211564aba5d6b54d87e104e2db76122d5f"
 default["redmine"]["port"]      = "80"
 default["redmine"]["domain"]    = "redmine.example.com"
+
+# Unicorn setting
+default["unicorn"]["port"]             = default["redmine"]["port"]
+default["unicorn"]["worker_processes"] = "5"
 
 # database setting
 default["redmine"]["db"]["name"] = "redmine"

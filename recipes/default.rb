@@ -112,7 +112,8 @@ include_recipe "unicorn"
 # TODO add notifies attribute that notify restart unicorn
 unicorn_config "#{node['redmine']['deploy_to']}/shared/config/unicorn.rb" do
   listen({ "80" => { :tcp_nodelay => true, :backlog => 100 }})
-  worker_processes "5"
+  worker_processes node["unicorn"]["worker_processes"]
+  preload_app true
   pid "#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid"
   stderr_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stderr.log"
   stdout_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stdout.log"
