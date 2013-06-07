@@ -4,11 +4,12 @@ This cookbook is designed to deploy the Redmine application.
 Currently supported:
 
 * Deploy the redmine app from the source
-* Install and Manage MySQL by the opscode official recipe
-* Install and Manage nginx with Unicorn by the opscode official recipe
+* Install and Manage MySQL by using the opscode official recipe
+* Install and Manage nginx(yet) with Unicorn by using the opscode official recipe
 
 Roadmap:
 
+* Install and setting nginx
 * Support log rotate for Rails, Unicorn logs
 * Use node attributes instead of hard coding
 * Support USR2 restart process
@@ -32,6 +33,9 @@ Tested on:
 * mysql
 * database
 * unicorn
+* iptables
+ * (this cookbook may be deprecated or heavily modified in favor of the general firewall cookbook)
+*
 
 ## Gemfile.lock
 Your redmine app must have `Gemfile.lock` to success `$ bundle install`.

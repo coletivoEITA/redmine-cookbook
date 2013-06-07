@@ -27,7 +27,7 @@ user node["redmine"]["user"] do
 end
 
 # Setup database
-# TODO cover postgresql
+# TODO support postgresql
 include_recipe "mysql::client"
 include_recipe "mysql::ruby"
 # TODO support 'recipe[mysql::server_ec2]'
@@ -113,10 +113,17 @@ include_recipe "unicorn"
 unicorn_config "#{node['redmine']['deploy_to']}/shared/config/unicorn.rb" do
   listen({ "80" => { :tcp_nodelay => true, :backlog => 100 }})
   worker_processes node["unicorn"]["worker_processes"]
-  preload_app true
+  worker_timeout node["unicorn"]["worker_timeout"]
+  preload_app node["unicorn"]["preload_app"]
   pid "#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid"
+  before_exec node["unicorn"]["before_exec"]
+  before_fork node["unicorn"]["before_fork"]
+  after_fork node["unicorn"]["after_fork"]
   stderr_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stderr.log"
   stdout_path "#{node['redmine']['deploy_to']}/shared/log/unicorn.stdout.log"
+  copy_on_write node["unicorn"]["copy_on_write"]
+  enable_stats node["unicorn"]["enable_stats"]
+  notifies nil
 end
 
 # Insall and setup for rmagick
@@ -194,7 +201,6 @@ deploy_revision node["redmine"]["deploy_to"] do
   if ::File.exists?("#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`")
     restart_command "kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`"
   end
-
 end
 
 execute "bundle exec unicorn -c config/unicorn.rb -D -E production" do
@@ -203,4 +209,3 @@ execute "bundle exec unicorn -c config/unicorn.rb -D -E production" do
   not_if { ::File.exists?("#{node["redmine"]["deploy_to"]}/shared/pids/unicorn.pid") }
   action :run
 end
-

@@ -21,13 +21,21 @@
 default["redmine"]["user"]      = "root"
 default["redmine"]["deploy_to"] = "/opt/redmine"
 default["redmine"]["repo"]      = "git://github.com/spesnova/redmine.git"
-default["redmine"]["revision"]  = "bfa275211564aba5d6b54d87e104e2db76122d5f"
+default["redmine"]["revision"]  = "4fa6a87c38e8d034d2f2b7740bf7507c6cf5f919"
 default["redmine"]["port"]      = "80"
 default["redmine"]["domain"]    = "redmine.example.com"
 
 # Unicorn setting
 default["unicorn"]["port"]             = default["redmine"]["port"]
-default["unicorn"]["worker_processes"] = "5"
+default["unicorn"]["options"]          = { :tcp_nodelay => true, :backlog => 100 }
+default["unicorn"]["worker_processes"] = [node[:cpu][:total].to_i * 4, 8].min
+default["unicorn"]["worker_timeout"]   = "60"
+default["unicorn"]["preload_app"]      = true
+default["unicorn"]["before_exec"]      = nil
+default["unicorn"]["before_fork"]      = nil
+default["unicorn"]["after_fork"]       = nil
+default["unicorn"]["enable_stats"]     = false
+default["unicorn"]["copy_on_write"]    = false
 
 # database setting
 default["redmine"]["db"]["name"] = "redmine"
