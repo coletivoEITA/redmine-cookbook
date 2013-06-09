@@ -22,7 +22,6 @@ include_recipe "git"
 # TODO install ruby
 
 user node["redmine"]["user"] do
-  home node["redmine"]["base_path"]
   system true
 end
 
