@@ -64,19 +64,19 @@ Use knife to create a data bag for redmine.
 $ knife data bag create redmine
 $ mkdir data_bags/redmine
 ```
-Create a secret redmine data in the `data_bag/redmine/secret.json` directory.
+Create a secret redmine data in the `data_bag/redmine/database.json` directory.
 ```
 {
-  "id": "secret",
-  "db_user_password": "<PASSWORD>"
+  "id": "database",
+  "user_password": "<PASSWORD>"
 }
 ```
 
-* `db_user_password` - The password described in config/database.yml
+* `user_password` - The database user password described in config/database.yml
 
 Upload the json data to Chef Server.
 ```
-$ knife data bag from file redmine data_bags/redmine/secret.json
+$ knife data bag from file redmine data_bags/redmine/database.json
 ```
 
 # License and Author
