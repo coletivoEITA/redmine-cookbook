@@ -171,12 +171,18 @@ deploy_revision node["redmine"]["deploy_to"] do
       group node["redmine"]["user"]
       mode "0644"
     end
-    execute "bundle install --path #{node["redmine"]["deploy_to"]}/shared/bundle > /tmp/bundle.log" do
+    execute "bundle install" do
+      command <<-CMD
+        bundle install \
+        --path #{node["redmine"]["deploy_to"]}/shared/bundle \
+        > /tmp/bundle.log
+      CMD
       user "root"
       cwd release_path
       action :run
     end
-    execute 'bundle exec rake generate_secret_token' do
+    execute "generate secret_token" do
+      command "bundle exec rake generate_secret_token"
       cwd release_path
       not_if { ::File.exists?("#{release_path}/config/initializers/secret_token.rb") }
       action :run
@@ -184,7 +190,12 @@ deploy_revision node["redmine"]["deploy_to"] do
   end
   symlink_before_migrate "config/database.yml" => "config/database.yml"
   migrate true
-  migration_command "bundle exec rake db:migrate --trace >/tmp/migration.log 2>&1 && bundle exec rake redmine:plugins --trace > /tmp/plugins_migration.log"
+  migration_command <<-CMD
+    bundle exec rake db:migrate \
+    --trace > /tmp/migration.log 2>&1 \
+    && bundle exec rake redmine:plugins \
+    --trace > /tmp/plugins_migration.log
+  CMD
 
   # Symlink
   purge_before_symlink %w{ log tmp/pids public/system }
@@ -198,11 +209,14 @@ deploy_revision node["redmine"]["deploy_to"] do
   # Restart
   # TODO support USR2 restart process
   if ::File.exists?("#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`")
-    restart_command "kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`"
+    restart_command <<-CMD
+      kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`
+    CMD
   end
 end
 
-execute "bundle exec unicorn -c config/unicorn.rb -D -E production" do
+execute "start unicorn" do
+  command "bundle exec unicorn -c config/unicorn.rb -D -E production"
   user "root"
   cwd "#{node["redmine"]["deploy_to"]}/current"
   not_if { ::File.exists?("#{node["redmine"]["deploy_to"]}/shared/pids/unicorn.pid") }
