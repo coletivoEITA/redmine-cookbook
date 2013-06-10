@@ -45,20 +45,20 @@ connection_info = {
   :password => node["mysql"]["server_root_password"]
 }
 
-mysql_database "redmine" do
+mysql_database node["redmine"]["database"] do
   connection connection_info
   action :create
 end
 
-mysql_database_user "redmine_user" do
+mysql_database_user node["redmine"]["database_user"] do
   connection connection_info
   password data_bag_item("redmine", "database")["user_password"]
   action :create
 end
 
-mysql_database_user "redmine_user" do
+mysql_database_user node["redmine"]["database_user"] do
   connection connection_info
-  database_name "redmine"
+  database_name node["redmine"]["database"]
   privileges [:all]
   password data_bag_item("redmine", "database")["user_password"]
   action :grant
@@ -157,9 +157,9 @@ deploy_revision node["redmine"]["deploy_to"] do
         group node["redmine"]["user"]
         mode "0644"
         variables({
-          :database => "redmine",
+          :database => node["redmine"]["database"],
           :host     => "localhost",
-          :username => "redmine_user",
+          :username => node["redmine"]["database_user"],
           :password => data_bag_item("redmine", "database")["user_password"],
           :encoding => "utf8"
         })

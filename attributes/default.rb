@@ -38,6 +38,8 @@ default["unicorn"]["enable_stats"]     = false
 default["unicorn"]["copy_on_write"]    = false
 
 # database setting
-default["redmine"]["db"]["name"] = "redmine"
+default["redmine"]["database"]      = "redmine"
+default["redmine"]["database_user"] = "redmine"
+
 default['mysql']['tunable']['character-set-server'] = "utf8"
 
