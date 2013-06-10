@@ -68,6 +68,9 @@ See the [opscode-cookbook/mysql](https://github.com/opscode-cookbooks/mysql) for
 * Deploy the redmine application
 * Start Unicorn
 
+## backup
+TODO
+
 # Data Bags
 This cookbook use the redmine data bag for some password.
 

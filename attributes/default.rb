@@ -43,3 +43,5 @@ default["redmine"]["database_user"] = "redmine"
 
 default['mysql']['tunable']['character-set-server'] = "utf8"
 
+# backup setting
+default["redmine"]["backup"]["split_into_chunks_of"] = 250
