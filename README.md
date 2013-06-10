@@ -46,15 +46,27 @@ TODO
 # Attributes
 See the `attributes/default.rb` for default values.
 
-* `node["redmine"]["user"]`
+* `node["redmine"]["user"]` - The redmine system user
 * `node["redmine"]["deploy_to"]` - The redmine application's deploy root path
 * `node["redmine"]["repo"]` - Repository URL for the redmine application
 * `node["redmine"]["revision"]` - The revision to be checked out
-* `node["redmine"]["db"]["name"]` - The Database name for redmine
+* `node["redmine"]["port"]` - The port redmine use
+* `node["redmine"]["database"]["name"]` - The Database name for redmine
+* `node["redmine"]["database"]["user"]` - The Database user
+
+See the [opscode-cookbook/unicorn](https://github.com/opscode-cookbooks/unicorn) for Unicorn setting.
+See the [opscode-cookbook/mysql](https://github.com/opscode-cookbooks/mysql) for MySQL setting.
 
 # Recipes
 ## default
-Setup the redmine application.
+
+* Install git
+* Create the system user for redmine
+* Install MySQL client/server and Configure database for redmine
+* Configure firewall
+* Install RMagick library
+* Deploy the redmine application
+* Start Unicorn
 
 # Data Bags
 This cookbook use the redmine data bag for some password.
