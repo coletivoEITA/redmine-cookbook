@@ -40,6 +40,14 @@ default["unicorn"]["copy_on_write"]    = false
 # database setting
 default["redmine"]["database"]      = "redmine"
 default["redmine"]["database_user"] = "redmine"
-
+# You can specify this password in role or data bags.
+# Note!! data bags attribute takes top precedence.
+default["redmine"]["user_password"] = nil
 default['mysql']['tunable']['character-set-server'] = "utf8"
+# The following three passwords is made automaticaly by mysql cookbook.
+# Also You can specify these in role or data bags.
+# Note!! data bags attribute takes top precedence.
+default["mysql"]["server_root_password"]   = nil
+default["mysql"]["server_repl_password"]   = nil
+default["mysql"]["server_debian_password"] = nil
 

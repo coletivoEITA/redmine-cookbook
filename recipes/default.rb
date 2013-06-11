@@ -27,6 +27,14 @@ end
 
 # Setup database
 # TODO support postgresql
+
+if redmine_db = data_bag_item("redmine", "database")
+  node.normal["redmine"]["user_password"]        = redmine_db["user_password"]
+  node.normal["mysql"]["server_root_password"]   = redmine_db["root_password"]
+  node.normal["mysql"]["server_repl_password"]   = redmine_db["repl_password"]
+  node.normal["mysql"]["server_debian_password"] = redmine_db["debian_password"]
+end
+
 include_recipe "mysql::client"
 include_recipe "mysql::ruby"
 # TODO support 'recipe[mysql::server_ec2]'
@@ -40,8 +48,6 @@ end
 connection_info = {
   :host => "localhost",
   :username => "root",
-  # specify at node["mysql"]["server_root_password"]
-  # TODO use data bags
   :password => node["mysql"]["server_root_password"]
 }
 
@@ -52,7 +58,7 @@ end
 
 mysql_database_user node["redmine"]["database_user"] do
   connection connection_info
-  password data_bag_item("redmine", "database")["user_password"]
+  password node["redmine"]["user_password"]
   action :create
 end
 
@@ -60,7 +66,7 @@ mysql_database_user node["redmine"]["database_user"] do
   connection connection_info
   database_name node["redmine"]["database"]
   privileges [:all]
-  password data_bag_item("redmine", "database")["user_password"]
+  password node["redmine"]["user_password"]
   action :grant
 end
 
@@ -160,7 +166,7 @@ deploy_revision node["redmine"]["deploy_to"] do
           :database => node["redmine"]["database"],
           :host     => "localhost",
           :username => node["redmine"]["database_user"],
-          :password => data_bag_item("redmine", "database")["user_password"],
+          :password => node["redmine"]["user_password"],
           :encoding => "utf8"
         })
       end
