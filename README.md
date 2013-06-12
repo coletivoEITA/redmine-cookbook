@@ -51,11 +51,14 @@ See the `attributes/default.rb` for default values.
 * `node["redmine"]["repo"]` - Repository URL for the redmine application
 * `node["redmine"]["revision"]` - The revision to be checked out
 * `node["redmine"]["port"]` - The port redmine use
-* `node["redmine"]["database"]["name"]` - The Database name for redmine
-* `node["redmine"]["database"]["user"]` - The Database user
+* `node["redmine"]["database` - The Database name for redmine
+* `node["redmine"]["database_user"]` - The Database user
+* `node["redmine"]["user_password"]` - The Database user password
 
 See the [opscode-cookbook/unicorn](https://github.com/opscode-cookbooks/unicorn) for Unicorn setting.
 See the [opscode-cookbook/mysql](https://github.com/opscode-cookbooks/mysql) for MySQL setting.
+
+* `node["mysql"]["server_root_password"]` - MySQL server's root password
 
 # Recipes
 ## default
@@ -69,18 +72,22 @@ See the [opscode-cookbook/mysql](https://github.com/opscode-cookbooks/mysql) for
 * Start Unicorn
 
 # Data Bags
-This cookbook use the redmine data bag for some password.
+This cookbook use the redmine data bag to manage database passwords.
+(Or you can manage by role.)
 
 Use knife to create a data bag for redmine.
 ```
 $ knife data bag create redmine
 $ mkdir data_bags/redmine
 ```
-Create a secret redmine data in the `data_bag/redmine/database.json` directory.
+Create a database item in the `data_bag/redmine/database.json` directory.
 ```
 {
   "id": "database",
-  "user_password": "<PASSWORD>"
+  "root_password": <"PASSWORD">,
+  "user_password": "<PASSWORD>",
+  "repl_password": "<PASSWORD>",
+  "debian_password": "<PASSWORD>"
 }
 ```
 
