@@ -70,9 +70,6 @@ mysql_database_user node["redmine"]["database_user"] do
   action :grant
 end
 
-# Setup web server
-# TODO install nginx
-
 # Setup firewall
 template "/etc/sysconfig/iptables" do
   source "iptables.erb"
@@ -111,12 +108,14 @@ end
   end
 end
 
+# Setup web server
+# TODO install nginx
 # Install unicorn
 include_recipe "unicorn"
 
 # TODO add notifies attribute that notify restart unicorn
 unicorn_config "#{node['redmine']['deploy_to']}/shared/config/unicorn.rb" do
-  listen({ "80" => { :tcp_nodelay => true, :backlog => 100 }})
+  listen({ node["unicorn"]["port"] => { :tcp_nodelay => true, :backlog => 100 }})
   worker_processes node["unicorn"]["worker_processes"]
   worker_timeout node["unicorn"]["worker_timeout"]
   preload_app node["unicorn"]["preload_app"]
@@ -156,8 +155,8 @@ deploy_revision node["redmine"]["deploy_to"] do
     [
       "#{node['redmine']['deploy_to']}/shared/config/database.yml",
       "#{release_path}/config/database.yml"
-    ].each do |dir|
-      template dir do
+    ].each do |t|
+      template t do
         source "database.yml.erb"
         owner node["redmine"]["user"]
         group node["redmine"]["user"]

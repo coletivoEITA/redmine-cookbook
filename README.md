@@ -44,7 +44,9 @@ Tested on:
 Your redmine app must have `Gemfile.lock` to success `$ bundle install`.
 
 # Usage
-TODO
+Include the recipe on your node or role that fits how you wish to install Redmine on your system per the recipes section above. Modify the attributes as required in your role to change how various configuration is applied per the attributes section above. In general, override attributes in the role should be used when changing attributes.
+
+There's some redundancy in that the config handling hasn't been separated from the installation method (yet), so use only one of the recipes, default or source.
 
 # Attributes
 ## default
@@ -69,18 +71,18 @@ See the [opscode-cookbook/mysql](https://github.com/opscode-cookbooks/mysql) for
 
 * `node["backup"]["base_dir"]` - String - default to `/opt/backup`
 * `node["backup"]["encryption_password"]` - String - default to `nil`
-* `node["backup"]["redmine"]["split_into_chunks_of"] - Fixnum
-* `node["backup"]["redmine"]["cron"]["minute"] - String
-* `node["backup"]["redmine"]["cron"]["hour"] - String
-* `node["backup"]["redmine"]["cron"]["day"] - String
-* `node["backup"]["redmine"]["cron"]["weekday"] - String
-* `node["backup"]["redmine"]["cron"]["mailto"] - String
-* `node["backup"]["redmine"]["store"]["server_username"] - String
-* `node["backup"]["redmine"]["store"]["server_password"] - String
-* `node["backup"]["redmine"]["store"]["server_ip"] - String
-* `node["backup"]["redmine"]["store"]["server_port"] - String
-* `node["backup"]["redmine"]["store"]["path"] - String - default to "/opt/backup/stores"
-* `node["backup"]["redmine"]["store"]["keep"] - String - default to 5
+* `node["backup"]["redmine"]["split_into_chunks_of"]` - Fixnum
+* `node["backup"]["redmine"]["cron"]["minute"]` - String
+* `node["backup"]["redmine"]["cron"]["hour"]` - String
+* `node["backup"]["redmine"]["cron"]["day"]` - String
+* `node["backup"]["redmine"]["cron"]["weekday"]` - String
+* `node["backup"]["redmine"]["cron"]["mailto"]` - String
+* `node["backup"]["redmine"]["store"]["server_username"]` - String
+* `node["backup"]["redmine"]["store"]["server_password"]` - String
+* `node["backup"]["redmine"]["store"]["server_ip"]` - String
+* `node["backup"]["redmine"]["store"]["server_port"]` - String
+* `node["backup"]["redmine"]["store"]["path"]` - String - default to "/opt/backup/stores"
+* `node["backup"]["redmine"]["store"]["keep"]` - String - default to 5
 
 See the [hw-cookbook/backup](https://github.com/hw-cookbooks/backup) for backup recipe detail.
 
