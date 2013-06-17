@@ -49,7 +49,7 @@ backup_generate_model "redmine" do
       "scp.keep"     => node["backup"]["redmine"]["store"]["keep"]
     }
   })
-  minute node["backup"]["redmine"]["cron"]["miniute"]
+  minute node["backup"]["redmine"]["cron"]["minute"]
   hour node["backup"]["redmine"]["cron"]["hour"]
   day node["backup"]["redmine"]["cron"]["day"]
   weekday node["backup"]["redmine"]["cron"]["weekday"]
