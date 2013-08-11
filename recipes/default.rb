@@ -212,10 +212,9 @@ deploy_revision node["redmine"]["deploy_to"] do
            "config/unicorn.rb" => "config/unicorn.rb"
 
   # Restart
-  # TODO support USR2 restart process
   if ::File.exists?("#{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`")
     restart_command <<-CMD
-      kill -HUP `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`
+      kill -USR2 `cat #{node['redmine']['deploy_to']}/shared/pids/unicorn.pid`
     CMD
   end
 end

@@ -1,3 +1,7 @@
+## v0.2.1:
+
+* Add default setup to uncorn.config for gracefull restart
+
 ## v0.2.0:
 
 * New Feature

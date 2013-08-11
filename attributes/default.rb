@@ -19,6 +19,7 @@
 #
 
 default["redmine"]["user"]      = "root"
+default["redmine"]["group"]     = "root"
 default["redmine"]["deploy_to"] = "/opt/redmine"
 default["redmine"]["repo"]      = "git://github.com/spesnova/redmine.git"
 default["redmine"]["revision"]  = "e526155ccb09e1d5e0ff16d4b6d6cf15ab9b15ba"
@@ -29,11 +30,37 @@ default["redmine"]["domain"]    = "redmine.example.com"
 default["unicorn"]["port"]             = default["redmine"]["port"]
 default["unicorn"]["options"]          = { :tcp_nodelay => true, :backlog => 100 }
 default["unicorn"]["worker_processes"] = [node[:cpu][:total].to_i * 4, 8].min
-default["unicorn"]["worker_timeout"]   = "60"
+default["unicorn"]["worker_timeout"]   = "30"
 default["unicorn"]["preload_app"]      = true
 default["unicorn"]["before_exec"]      = nil
-default["unicorn"]["before_fork"]      = nil
-default["unicorn"]["after_fork"]       = nil
+default["unicorn"]["before_fork"]      = <<-BLOCK
+old_pid = "#{node['redmine']['deploy_to']}/current" + '/tmp/pids/unicorn.pid.oldbin'
+  if ::File.exists?(old_pid) && server.pid != old_pid
+    begin
+      process.kill("QUIT", ::File.read(old_pid).to_i)
+    rescue Errno::ENOENT, Errno::ESRCH
+      # someone else did our job for us
+    end
+  end
+BLOCK
+default["unicorn"]["after_fork"]       = <<-BLOCK
+ActiveRecord::Base.establish_connection
+
+  begin
+    uid, gid = Process.euid, Process.egid
+    user, group = "#{node['redmine']['user']}", "#{node['redmine']['user']}"
+    target_uid = Etc.getpwnam(user).uid
+    target_gid = Etc.getgrnam(group).gid
+    worker.tmp.chown(target_uid, target_gid)
+    if uid != target_uid || gid != target_gid
+      Process.initgroups(user, target_gid)
+      Process::GID.change_privilege(target_gid)
+      Process::UID.change_privilege(target_uid)
+    end
+  rescue => e
+    raise e
+  end
+BLOCK
 default["unicorn"]["enable_stats"]     = false
 default["unicorn"]["copy_on_write"]    = false
 
