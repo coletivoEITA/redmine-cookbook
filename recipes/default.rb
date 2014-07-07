@@ -70,21 +70,6 @@ mysql_database_user node["redmine"]["database_user"] do
   action :grant
 end
 
-# Setup firewall
-template "/etc/sysconfig/iptables" do
-  source "iptables.erb"
-  owner "root"
-  group "root"
-  mode "0600"
-  variables({:port => node["redmine"]["port"]})
-  notifies :restart, "service[iptables]"
-end
-
-service "iptables" do
-  supports :status => true, :restart => true, :reload => true
-  action [:enable, :start]
-end
-
 # Making the directories for deploy
 directory node["redmine"]["deploy_to"] do
   owner node["redmine"]["user"]
